@@ -84,6 +84,16 @@
 
 - (없음)
 
+## 💡 작업 중 주의사항 (지금까지 배운 것)
+
+- **새 터미널은 바깥 폴더에서 열림** → 항상 `cd ...\ax-job-agent` → `.\.venv\Scripts\Activate.ps1` 먼저
+- **Notebook 커널**은 `ax-job-agent (.venv)` 선택 (Select Kernel → Jupyter Kernel)
+- **Claude Code 로그인**: 조직(Teamsparta) 계정은 막혀 있음 → 개인/Team 계정으로 `/login`
+- **Claude Code 입력칸의 흐린 글씨는 자동 제안** → Enter 누르지 말고 지운 뒤 직접 입력
+- **에이전트가 Notebook을 수정하면 VS Code 화면과 충돌 가능** → "저장할까요?" 창에서 **Don't Save**, 파일 다시 열기
+- 에이전트에게 셀 실행·설치·commit은 시키지 않음 → 직접 함
+- commit은 `git add 파일이름`으로 필요한 파일만 (`../../.vscode/`는 올리지 않음)
+
 ---
 
 ## 📝 작업 로그 (최신이 위)
