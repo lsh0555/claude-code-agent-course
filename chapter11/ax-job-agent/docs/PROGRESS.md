@@ -11,25 +11,25 @@
 | 항목 | 값 |
 |---|---|
 | 마지막 업데이트 | 2026-09-23 |
-| 현재 STEP | **STEP 07. 신규 공고 판별** (시작 전) |
-| 마지막으로 완료한 STEP | STEP 06. 전처리 / 중복 제거 (`clean_df` 10행 × 10열) |
+| 현재 STEP | **STEP 08. 기본 분석 / 관련 공고 필터** (시작 전) |
+| 마지막으로 완료한 STEP | STEP 07. 신규 공고 판별 (두 번 실행 테스트 통과) |
 | 마지막 사용 에이전트 | Claude Code |
 | 브랜치 | `ax-job-agent` |
-| 마지막 commit | `STEP 06: preprocess` |
+| 마지막 commit | `STEP 07: find new jobs` |
 
 ---
 
 ## 👉 다음에 할 일 (여기부터 시작)
 
-**STEP 07. 신규 공고 판별**: 순서대로 진행
+**STEP 08. 기본 분석 / 관련 공고 필터**: 순서대로 진행
 
 1. [ ] 시작 루틴 (GUIDE.md 0장) + 커널 `ax-job-agent (.venv)` 확인
-2. [ ] **커널을 재시작했다면**: STEP 02 `COLUMNS` → 04-1 경로 셀(저장 셀 제외) → 04-3 추출 → STEP 05 `df` → STEP 06 `clean_df` 셀 순서로 다시 실행 (STEP 03 요청 셀은 실행하지 않기)
-3. [ ] Orchestrator에게 STEP 07 지시문 받기 → Claude Code에 전달
-4. [ ] `data/processed/jobs_history.csv`와 비교해 신규 공고만 `new_df`로 → **같은 셀 두 번 실행 시 두 번째는 신규 0건**인지 확인
-5. [ ] 결과 해석 → Clear All Outputs → commit & push
+2. [ ] `print(len(new_df))` → **10**인지 확인. 0이면 `data/processed/jobs_history.csv`를 지우고 STEP 07 신규 판별 셀을 **1번만** 실행
+3. [ ] **커널을 재시작했다면**: STEP 02 → 04-1 경로 셀(저장 셀 제외) → 04-3 → STEP 05 → STEP 06 → (history 파일 지우고) STEP 07 설정·신규 판별 셀 1번 (STEP 03 요청 셀은 실행하지 않기)
+4. [ ] Orchestrator에게 STEP 08 지시문 받기 → Claude Code에 전달
+5. [ ] pandas로 통계 계산 → 숫자 1~2개 직접 세어 검증 → 결과 해석 → commit & push
 
-**그다음** → STEP 08. 기본 분석 / 관련 공고 필터
+**그다음** → STEP 09. Gemini API 연동
 
 ---
 
@@ -45,7 +45,7 @@
 | 04 | 소량 데이터 수집 | ✅ 완료 | 2026-09-23 | Claude Code | 10건 추출(건너뜀 0), `extract_job()` 함수 |
 | 05 | DataFrame 생성 | ✅ 완료 | 2026-09-23 | Claude Code | (10, 9), 빈 값 0, 모든 컬럼 str(글자) |
 | 06 | 전처리 / 중복 제거 | ✅ 완료 | 2026-09-23 | Claude Code | 빈 값 0, 중복 0, 날짜 변환 실패 0, 상시채용 2건 (`is_always_open` 컬럼 추가) |
-| 07 | 신규 공고 판별 | ⬜ | | | |
+| 07 | 신규 공고 판별 | ✅ 완료 | 2026-09-23 | Claude Code | 1번째 신규 10 → 2번째 신규 0. `jobs_history.csv` |
 | 08 | 기본 분석 / 관련 공고 필터 | ⬜ | | | |
 | 09 | Gemini API 연동 | ⬜ | | | |
 | 10 | Gemini 결과 검증 | ⬜ | | | |
@@ -91,6 +91,8 @@
 
 - ~~마감일 `2070-01-01`~~ → STEP 06에서 `is_always_open=True` + `closing_date` 빈 값(NaT)으로 처리 완료
 
+- **`jobs_history.csv`는 아직 Git에 올리지 않음** (개발 중 테스트 데이터). GitHub Actions에서 history를 어떻게 유지할지는 STEP 17에서 결정
+
 ## 💡 작업 중 주의사항 (지금까지 배운 것)
 
 - **새 터미널은 바깥 폴더에서 열림** → 항상 `cd ...\ax-job-agent` → `.\.venv\Scripts\Activate.ps1` 먼저
@@ -101,6 +103,7 @@
 - 에이전트에게 셀 실행·설치·commit은 시키지 않음 → 직접 함
 - **요청 셀은 여러 번 실행하지 않음** (실행할 때마다 사이트에 요청 1번)
 - VS Code에 `PROGRESS.md`가 열려 있으면 옛날 내용으로 덮어쓸 수 있음 → 저장 전 확인
+- **STEP 07 신규 판별 셀을 두 번 실행하면 `new_df`가 0건이 됨** → 개발 중에는 history 파일을 지우고 1번만 실행
 - commit은 `git add 파일이름`으로 필요한 파일만 (`../../.vscode/`는 올리지 않음)
 
 ---
@@ -109,6 +112,7 @@
 
 | 날짜 | STEP | 한 일 | 에이전트 |
 |---|---|---|---|
+| 2026-09-23 | 07 | 신규 판별 두 번 실행 테스트: 1번째 신규 10 / history 10, 2번째 신규 0 / history 10 | Claude Code / 직접 |
 | 2026-09-23 | 06 | `clean_df` 생성: 중복 제거, 상시채용 표시(2건), 날짜 3개 컬럼 datetime 변환(실패 0) | Claude Code / 직접 |
 | 2026-09-23 | 05 | `df = pd.DataFrame(rows, columns=COLUMNS)` → shape (10, 9), 빈 값 없음, 날짜도 글자(str) 상태 | Claude Code / 직접 |
 | 2026-09-23 | 04 | 결과 해석 작성, commit & push (`STEP 04: extract 10 jobs`) | 직접 |
