@@ -11,30 +11,26 @@
 | 항목 | 값 |
 |---|---|
 | 마지막 업데이트 | 2026-09-23 |
-| 현재 STEP | **STEP 01. 개발환경 확인** (셀 실행 성공, 마무리 남음) |
-| 마지막으로 완료한 STEP | STEP 00-B. 문서 파일 |
-| 마지막 사용 에이전트 | 없음 (셀은 직접 작성) |
-| 브랜치 | `ax-job-agent` |
-| 마지막 commit | 아직 없음 |
+| 현재 STEP | **STEP 03. 채용공고 페이지 접근 테스트** (시작 전) |
+| 마지막으로 완료한 STEP | STEP 02. 수집 데이터 명세 |
+| 마지막 사용 에이전트 | Claude Code (STEP 02 셀 작성) |
+| 브랜치 | `ax-job-agent` (origin에 push 완료, 추적 설정됨) |
+| 마지막 commit | `STEP 02: define data columns` (push 완료) |
 
 ---
 
 ## 👉 다음에 할 일 (여기부터 시작)
 
-**STEP 01 마무리**: 순서대로 진행
+**STEP 03. 채용공고 페이지 접근 테스트**: 순서대로 진행
 
-1. [ ] Notebook의 "실행 결과 해석" 셀 채우기 → `Ctrl + S` 저장
-2. [ ] `AGENTS.md`, `CLAUDE.md`가 남아 있으면 삭제 (사용하지 않기로 함)
-3. [ ] Notebook 위쪽 **Clear All Outputs** → `Ctrl + S`
-4. [ ] 첫 commit & push
-   ```powershell
-   git status --short -uall     # .gitignore, docs/ 3개, notebooks/ax_job_pipeline.ipynb 만 보여야 함
-   git add .
-   git commit -m "STEP 01: docs, gitignore, env check notebook"
-   git push -u origin ax-job-agent
-   ```
+1. [ ] 시작 루틴 (GUIDE.md 0장): `cd` → `.venv` 활성화 → `git branch` → `git status`
+2. [ ] Notebook 커널이 `ax-job-agent (.venv)`인지 확인
+3. [ ] Claude Code 또는 Codex 실행 → Orchestrator가 준 STEP 03 지시문 전달
+4. [ ] 추가된 셀 직접 실행 → 결과 확인
+5. [ ] "실행 결과 해석" 셀 채우기 → Clear All Outputs → 저장
+6. [ ] commit & push
 
-**그다음** → STEP 02. 수집 데이터 명세 (GUIDE.md 3장 참고)
+**그다음** → STEP 04. 소량 데이터 수집
 
 ---
 
@@ -44,8 +40,8 @@
 |---|---|---|---|---|---|
 | 00 | 환경 준비 | ✅ 완료 | 2026-09-23 | - | Fork, Clone, remote, 브랜치, .venv, 패키지 |
 | 00-B | 문서 파일 | ✅ 완료 | 2026-09-23 | - | docs/ 3개 문서 |
-| 01 | 개발환경 확인 | 🔄 진행 중 | | 직접 작성 | 셀 실행 성공, commit 남음 |
-| 02 | 수집 데이터 명세 | ⬜ | | | |
+| 01 | 개발환경 확인 | ✅ 완료 | 2026-09-23 | 직접 작성 | 첫 commit & push 완료 |
+| 02 | 수집 데이터 명세 | ✅ 완료 | 2026-09-23 | Claude Code | `COLUMNS` 9개 정의 (SPEC 6장 순서) |
 | 03 | 페이지 접근 테스트 | ⬜ | | | |
 | 04 | 소량 데이터 수집 | ⬜ | | | |
 | 05 | DataFrame 생성 | ⬜ | | | |
@@ -94,6 +90,9 @@
 
 | 날짜 | STEP | 한 일 | 에이전트 |
 |---|---|---|---|
+| 2026-09-23 | 02 | 셀 실행 성공 (`COLUMNS` 9개 확인), 결과 해석 작성, commit & push | 직접 / Claude Code |
+| 2026-09-23 | 02 | Notebook에 STEP 02 셀 4개 추가 (명세 표, `COLUMNS`, 확인 출력, 결과 해석) | Claude Code |
+| 2026-09-23 | 01 | 첫 commit & `git push -u origin ax-job-agent` 성공 | - |
 | 2026-09-23 | 01 | 환경 확인 셀 실행 성공 (Python 3.14.6, .venv, pandas 3.0.6, requests 2.34.2, bs4 OK) | 직접 |
 | 2026-09-23 | 01 | pandas import 오류 → `pip install --force-reinstall --no-cache-dir pandas numpy` + 커널 Restart로 해결 | - |
 | 2026-09-23 | 01 | `python -m ipykernel install --user --name ax-job-agent` 로 .venv 커널 등록 | - |
