@@ -11,25 +11,23 @@
 | 항목 | 값 |
 |---|---|
 | 마지막 업데이트 | 2026-09-23 |
-| 현재 STEP | **STEP 08. 기본 분석 / 관련 공고 필터** (시작 전) |
-| 마지막으로 완료한 STEP | STEP 07. 신규 공고 판별 (두 번 실행 테스트 통과) |
+| 현재 STEP | **STEP 10. Gemini 결과 검증** (진행 중) |
+| 마지막으로 완료한 STEP | STEP 09. Gemini API 연동 (`summaries` 3건) |
 | 마지막 사용 에이전트 | Claude Code |
 | 브랜치 | `ax-job-agent` |
-| 마지막 commit | `STEP 07: find new jobs` |
+| 마지막 commit | `STEP 09-10: gemini summary and review` |
 
 ---
 
 ## 👉 다음에 할 일 (여기부터 시작)
 
-**STEP 08. 기본 분석 / 관련 공고 필터**: 순서대로 진행
+**STEP 10 마무리 → STEP 11**
 
-1. [ ] 시작 루틴 (GUIDE.md 0장) + 커널 `ax-job-agent (.venv)` 확인
-2. [ ] `print(len(new_df))` → **10**인지 확인. 0이면 `data/processed/jobs_history.csv`를 지우고 STEP 07 신규 판별 셀을 **1번만** 실행
-3. [ ] **커널을 재시작했다면**: STEP 02 → 04-1 경로 셀(저장 셀 제외) → 04-3 → STEP 05 → STEP 06 → (history 파일 지우고) STEP 07 설정·신규 판별 셀 1번 (STEP 03 요청 셀은 실행하지 않기)
-4. [ ] Orchestrator에게 STEP 08 지시문 받기 → Claude Code에 전달
-5. [ ] pandas로 통계 계산 → 숫자 1~2개 직접 세어 검증 → 결과 해석 → commit & push
+1. [ ] STEP 09 해석 셀, STEP 10 검증 셀 작성 → Clear All Outputs → commit & push
+2. [ ] **결정 필요**: 공고 **본문(상세 페이지)**도 Gemini에 보낼지 (아래 "결정 필요 사항" 참고)
+3. [ ] STEP 11. Markdown 보고서 생성
 
-**그다음** → STEP 09. Gemini API 연동
+**그다음** → STEP 11. Markdown 보고서
 
 ---
 
@@ -45,10 +43,10 @@
 | 04 | 소량 데이터 수집 | ✅ 완료 | 2026-09-23 | Claude Code | 10건 추출(건너뜀 0), `extract_job()` 함수 |
 | 05 | DataFrame 생성 | ✅ 완료 | 2026-09-23 | Claude Code | (10, 9), 빈 값 0, 모든 컬럼 str(글자) |
 | 06 | 전처리 / 중복 제거 | ✅ 완료 | 2026-09-23 | Claude Code | 빈 값 0, 중복 0, 날짜 변환 실패 0, 상시채용 2건 (`is_always_open` 컬럼 추가) |
-| 07 | 신규 공고 판별 | ✅ 완료 | 2026-09-23 | Claude Code | 1번째 신규 10 → 2번째 신규 0. `jobs_history.csv` |
-| 08 | 기본 분석 / 관련 공고 필터 | ⬜ | | | |
-| 09 | Gemini API 연동 | ⬜ | | | |
-| 10 | Gemini 결과 검증 | ⬜ | | | |
+| 07 | 신규 공고 판별 | ✅ 완료 | 2026-09-23 | Claude Code | 07-A(판별만) / 07-B(저장만) 분리. 두 번 실행 테스트 통과 |
+| 08 | 기본 분석 / 관련 공고 필터 | ✅ 완료 | 2026-09-23 | Claude Code | 신규 10, 경기5·서울5, 경력5년↑ 4, 마감임박 2, AX 관련 10 |
+| 09 | Gemini API 연동 | ✅ 완료 | 2026-09-23 | Claude Code | 3건 요약 성공, JSON 파싱 실패 0, 약 1분 21초 |
+| 10 | Gemini 결과 검증 | 🔄 진행 중 | | 직접 | 3건 모두 제목과 일치, 지어낸 기술 없음. 제목만 보내서 정보량이 적음 |
 | 11 | Markdown 보고서 | ⬜ | | | |
 | 12 | Slack 발송 | ⬜ | | | |
 | 13 | Gmail 발송 | ⬜ | | | |
@@ -71,10 +69,10 @@
 | upstream | ✅ GilbertMoon (강의 원본, 가져오기만) |
 | 브랜치 | ✅ `ax-job-agent` |
 | 가상환경 | ✅ `.venv` |
-| 설치 패키지 | ✅ pandas 3.0.6, requests 2.34.2, beautifulsoup4, jupyter, python-dotenv 1.2.3 |
+| 설치 패키지 | ✅ pandas 3.0.6, requests 2.34.2, beautifulsoup4, jupyter, python-dotenv 1.2.3, google-genai 2.25.0 |
 | `.gitignore` | ✅ `.venv/`, `.env`, `__pycache__/`, `.ipynb_checkpoints/` |
 | Notebook 커널 | ✅ `ax-job-agent (.venv)` (Jupyter Kernel로 등록) |
-| `.env` | ⬜ 아직 없음 (STEP 09에서 생성) |
+| `.env` | ✅ `GEMINI_API_KEY` (Git 제외 확인) / `.env.example` 빈 양식 |
 | Gemini / Slack / Gmail 키 | ⬜ 아직 없음 |
 
 ---
@@ -93,6 +91,10 @@
 
 - **`jobs_history.csv`는 아직 Git에 올리지 않음** (개발 중 테스트 데이터). GitHub Actions에서 history를 어떻게 유지할지는 STEP 17에서 결정
 
+- **같은 회사가 다른 이름으로 나옴**: `주식회사 솔트룩스` vs `㈜솔트룩스` → 회사별 집계가 1건씩 따로 잡힘. 회사명 정리 규칙(㈜·주식회사 제거 등)을 STEP 14 함수화 때 `preprocess.py`에 추가할지 결정 필요
+
+- **Gemini에 제목만 보내서 요약 정보가 적음** (기술이 'LLM' 정도만 나옴). 공고 상세 페이지(본문)도 보낼지 결정 필요 → 보내면 공고당 요청 1번 추가 (10건이면 사이트에 10번 요청)
+
 ## 💡 작업 중 주의사항 (지금까지 배운 것)
 
 - **새 터미널은 바깥 폴더에서 열림** → 항상 `cd ...\ax-job-agent` → `.\.venv\Scripts\Activate.ps1` 먼저
@@ -103,7 +105,9 @@
 - 에이전트에게 셀 실행·설치·commit은 시키지 않음 → 직접 함
 - **요청 셀은 여러 번 실행하지 않음** (실행할 때마다 사이트에 요청 1번)
 - VS Code에 `PROGRESS.md`가 열려 있으면 옛날 내용으로 덮어쓸 수 있음 → 저장 전 확인
-- **STEP 07 신규 판별 셀을 두 번 실행하면 `new_df`가 0건이 됨** → 개발 중에는 history 파일을 지우고 1번만 실행
+- **STEP 07은 07-A(판별만)와 07-B(history 저장)로 분리함** → 개발 중에는 **07-B를 실행하지 않음**. `new_df`가 0건이면 `jobs_history.csv` 삭제 후 07-A 실행
+- **`Run All` 쓰지 않기** → STEP 03 요청 셀, 07-B 저장 셀까지 다시 실행됨
+- **Gemini 3건 요약 셀은 다시 실행하지 않기** (무료 사용량 소모, 1분 이상 걸림). 결과 보기는 출력용 셀만 실행
 - commit은 `git add 파일이름`으로 필요한 파일만 (`../../.vscode/`는 올리지 않음)
 
 ---
@@ -112,6 +116,12 @@
 
 | 날짜 | STEP | 한 일 | 에이전트 |
 |---|---|---|---|
+| 2026-09-23 | 10 | 3건 검증: 요약·기술·지역·경력 모두 입력 정보와 일치, 추측으로 지어낸 내용 없음 | 직접 / Orchestrator |
+| 2026-09-23 | 09-3 | `build_prompt()` + 3건 요약 (NHN, 현대오토에버, 쿡앱스) 성공 | Claude Code |
+| 2026-09-23 | 09-2 | google-genai 설치, `client.interactions.create(model="gemini-3.8-flash")` 연결 테스트 성공 | 직접 |
+| 2026-09-23 | 09-1 | Gemini API Key 발급, `.env`·`.env.example` 생성, git status로 `.env` 제외 확인 | 직접 |
+| 2026-09-23 | 08 | 기본 통계·마감 임박(2건)·AX 필터(10/10) → `analysis` dict. 카카오 2건, 경기 5건 직접 세어 일치 | Claude Code / 직접 |
+| 2026-09-23 | 07 | 신규 판별 셀을 07-A(판별)·07-B(저장)로 분리 (재실행 시 new_df 0건 되는 문제 해결) | Claude Code |
 | 2026-09-23 | 07 | 신규 판별 두 번 실행 테스트: 1번째 신규 10 / history 10, 2번째 신규 0 / history 10 | Claude Code / 직접 |
 | 2026-09-23 | 06 | `clean_df` 생성: 중복 제거, 상시채용 표시(2건), 날짜 3개 컬럼 datetime 변환(실패 0) | Claude Code / 직접 |
 | 2026-09-23 | 05 | `df = pd.DataFrame(rows, columns=COLUMNS)` → shape (10, 9), 빈 값 없음, 날짜도 글자(str) 상태 | Claude Code / 직접 |
