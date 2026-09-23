@@ -11,25 +11,25 @@
 | 항목 | 값 |
 |---|---|
 | 마지막 업데이트 | 2026-09-23 |
-| 현재 STEP | **STEP 05. DataFrame 생성** (시작 전) |
-| 마지막으로 완료한 STEP | STEP 04. 소량 데이터 수집 (`rows` 10건) |
+| 현재 STEP | **STEP 06. 전처리 / 중복 제거** (시작 전) |
+| 마지막으로 완료한 STEP | STEP 05. DataFrame 생성 (`df` 10행 × 9열) |
 | 마지막 사용 에이전트 | Claude Code |
 | 브랜치 | `ax-job-agent` |
-| 마지막 commit | `STEP 04: extract 10 jobs` |
+| 마지막 commit | `STEP 05: create DataFrame` |
 
 ---
 
 ## 👉 다음에 할 일 (여기부터 시작)
 
-**STEP 05. DataFrame 생성**: 순서대로 진행
+**STEP 06. 전처리 / 중복 제거**: 순서대로 진행
 
-1. [ ] 시작 루틴 (GUIDE.md 0장): `cd` → `.venv` 활성화 → `git branch` → `git status`
-2. [ ] Notebook 커널 `ax-job-agent (.venv)` 확인
-3. [ ] **커널을 재시작했다면**: 요청 셀(STEP 03)은 건너뛰고, 04-1 경로 셀 → 04-3 추출 셀만 실행해서 `rows`를 다시 만들기
-4. [ ] Orchestrator에게 STEP 05 지시문 받기 → Claude Code에 전달
-5. [ ] `df.shape`가 `(10, 9)`인지 확인 → 결과 해석 → Clear All Outputs → commit & push
+1. [ ] 시작 루틴 (GUIDE.md 0장) + 커널 `ax-job-agent (.venv)` 확인
+2. [ ] **커널을 재시작했다면**: STEP 02 `COLUMNS` 셀 → 04-1 경로 셀(저장 셀은 건너뛰기) → 04-3 추출 셀 → STEP 05 `df` 셀 순서로 다시 실행 (STEP 03 요청 셀은 실행하지 않기)
+3. [ ] Orchestrator에게 STEP 06 지시문 받기 → Claude Code에 전달
+4. [ ] 빈 값·중복 확인, 날짜를 날짜형으로 변환, 마감일 2070-01-01 → "상시채용" 표시
+5. [ ] 결과 해석 → Clear All Outputs → commit & push
 
-**그다음** → STEP 06. 전처리 / 중복 제거 (마감일 2070-01-01 → "상시채용" 처리 포함)
+**그다음** → STEP 07. 신규 공고 판별
 
 ---
 
@@ -43,7 +43,7 @@
 | 02 | 수집 데이터 명세 | ✅ 완료 | 2026-09-23 | Claude Code | `COLUMNS` 9개 정의 (SPEC 6장 순서) |
 | 03 | 페이지 접근 테스트 | ✅ 완료 | 2026-09-23 | Claude Code | 200 OK, text/html, 340,027자, 'LLM' 191회 |
 | 04 | 소량 데이터 수집 | ✅ 완료 | 2026-09-23 | Claude Code | 10건 추출(건너뜀 0), `extract_job()` 함수 |
-| 05 | DataFrame 생성 | ⬜ | | | |
+| 05 | DataFrame 생성 | ✅ 완료 | 2026-09-23 | Claude Code | (10, 9), 빈 값 0, 모든 컬럼 str(글자) |
 | 06 | 전처리 / 중복 제거 | ⬜ | | | |
 | 07 | 신규 공고 판별 | ⬜ | | | |
 | 08 | 기본 분석 / 관련 공고 필터 | ⬜ | | | |
@@ -109,6 +109,7 @@
 
 | 날짜 | STEP | 한 일 | 에이전트 |
 |---|---|---|---|
+| 2026-09-23 | 05 | `df = pd.DataFrame(rows, columns=COLUMNS)` → shape (10, 9), 빈 값 없음, 날짜도 글자(str) 상태 | Claude Code / 직접 |
 | 2026-09-23 | 04 | 결과 해석 작성, commit & push (`STEP 04: extract 10 jobs`) | 직접 |
 | 2026-09-23 | 04-3 | `extract_job()` 함수로 공고 10건 추출, 건너뜀 0건. 마감일 2070-01-01 2건 발견 | Claude Code |
 | 2026-09-23 | 04-2 | 공고 1건(NHN, 49941022) 9개 컬럼 추출 → 브라우저와 비교 일치 | Claude Code / 직접 |
